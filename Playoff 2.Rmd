@@ -1,0 +1,1006 @@
+---
+title: "Playoff 2"
+author: "Caroline Tobin"
+date: "10/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+results = read.csv("game_results.csv")
+```
+
+```{r}
+results2 = results %>%
+  filter(schedule_season >= 2011) %>%
+  select(-X) %>%
+  filter(schedule_playoff == FALSE) %>%
+  filter(!is.na(score_home)) %>%
+  select(-schedule_playoff)
+```
+
+```{r}
+def10 = read.csv("P2.2010.Def.Stats.csv")
+def11 = read.csv("P2.2011.Def.Stats.csv")
+def12 = read.csv("P2.2012.Def.Stats.csv")
+def13 = read.csv("P2.2013.Def.Stats.csv")
+def14 = read.csv("P2.2014.Def.Stats.csv")
+def15 = read.csv("P2.2015.Def.Stats.csv")
+def16 = read.csv("P2.2016.Def.Stats.csv")
+def17 = read.csv("P2.2017.Def.Stats.csv")
+def18 = read.csv("P2.2018.Def.Stats.csv")
+def19 = read.csv("P2.2019.Def.Stats.csv")
+def20 = read.csv("P2.2020.Def.Stats.csv")
+def21 = read.csv("P2.2021.Def.Stats.csv")
+```
+
+```{r}
+off10 = read.csv("P2.2010.Off.Stats.csv")
+off11 = read.csv("P2.2011.Off.Stats.csv")
+off12 = read.csv("P2.2012.Off.Stats.csv")
+off13 = read.csv("P2.2013.Off.Stats.csv")
+off14 = read.csv("P2.2014.Off.Stats.csv")
+off15 = read.csv("P2.2015.Off.Stats.csv")
+off16 = read.csv("P2.2016.Off.Stats.csv")
+off17 = read.csv("P2.2017.Off.Stats.csv")
+off18 = read.csv("P2.2018.Off.Stats.csv")
+off19 = read.csv("P2.2019.Off.Stats.csv")
+off20 = read.csv("P2.2020.Off.Stats.csv")
+off21 = read.csv("P2.2021.Off.Stats.csv")
+```
+
+```{r}
+defense_clean = function(x) {
+  y = x[-c(1,2,35,36,37),] %>%
+  select(-X) %>%
+  transmute(d.Rank = as.numeric(X.1), Team = X.2, games_played = as.numeric(X.3), d.points_allowed = as.numeric(X.4), d.yards = as.numeric(X.5), d.off_plays = as.numeric(X.6), d.yards_off_play = as.numeric(X.7), d.turnovers = as.numeric(X.8), d.fumbles = as.numeric(X.9), d.first_downs = as.numeric(X.10), d.passes_complete = as.numeric(X.11), d.passes_attempt = as.numeric(X.12), d.yards_pass = as.numeric(X.13), d.td_pass = as.numeric(X.14), d.intercept = as.numeric(X.15), d.pass_netyardsattempt = as.numeric(X.16), d.firstdowns_pass = as.numeric(X.17), d.rush_attempt = as.numeric(X.18), d.yards_rush = as.numeric(X.19), d.td_rush = as.numeric(X.20), d.rush_yardsperattempt = as.numeric(X.21), d.firstdowns_rush = as.numeric(X.22), d.penalties = as.numeric(X.23), d.pen_yards = as.numeric(X.24), d.firstdowns_pen = as.numeric(X.25), d.Sc_perc = as.numeric(X.26), d.TO_perc = as.numeric(X.27), d.EXP = as.numeric(X.28))
+  return(y)
+}
+```
+
+```{r}
+def10b = defense_clean(def10)
+def11b = defense_clean(def11)
+def12b = defense_clean(def12)
+def13b = defense_clean(def13)
+def14b = defense_clean(def14)
+def15b = defense_clean(def15)
+def16b = defense_clean(def16)
+def17b = defense_clean(def17)
+def18b = defense_clean(def18)
+def19b = defense_clean(def19)
+def20b = defense_clean(def20)
+def21b = defense_clean(def21)
+```
+
+```{r}
+offense_clean = function(x) {
+  y = x[-c(1,2,35,36,37),] %>%
+  select(-X) %>%
+  transmute(o.Rank = as.numeric(X.1), Team = X.2, games_played = as.numeric(X.3), o.points_scored = as.numeric(X.4), o.yards = as.numeric(X.5), o.off_plays = as.numeric(X.6), o.yards_off_play = as.numeric(X.7), o.turnovers = as.numeric(X.8), o.fumbles = as.numeric(X.9), o.first_downs = as.numeric(X.10), o.passes_complete = as.numeric(X.11), o.passes_attempt = as.numeric(X.12), o.yards_pass = as.numeric(X.13), o.td_pass = as.numeric(X.14), o.intercept = as.numeric(X.15), o.pass_netyardsattempt = as.numeric(X.16), o.firstdowns_pass = as.numeric(X.17), o.rush_attempt = as.numeric(X.18), o.yards_rush = as.numeric(X.19), o.td_rush = as.numeric(X.20), o.rush_yardsperattempt = as.numeric(X.21), o.firstdowns_rush = as.numeric(X.22), o.penalties = as.numeric(X.23), o.pen_yards = as.numeric(X.24), o.firstdowns_pen = as.numeric(X.25), o.Sc_perc = as.numeric(X.26), o.TO_perc = as.numeric(X.27), o.EXP = as.numeric(X.28))
+  return(y)
+}
+```
+
+```{r}
+off10b = offense_clean(off10)
+off11b = offense_clean(off11)
+off12b = offense_clean(off12)
+off13b = offense_clean(off13)
+off14b = offense_clean(off14)
+off15b = offense_clean(off15)
+off16b = offense_clean(off16)
+off17b = offense_clean(off17)
+off18b = offense_clean(off18)
+off19b = offense_clean(off19)
+off20b = offense_clean(off20)
+off21b = offense_clean(off21)
+```
+
+
+```{r}
+for(i in colnames(def10b)){
+  results2[paste(i, ".away", sep = "")] = NA
+}
+for(i in colnames(def10b)){
+  results2[paste(i, ".home", sep = "")] = NA
+}
+
+for(i in colnames(off10b)){
+  results2[paste(i, ".away", sep = "")] = NA
+}
+for(i in colnames(off10b)){
+  results2[paste(i, ".home", sep = "")] = NA
+}
+
+for(i in colnames(def10b)){
+  results2[paste(i, ".away-1", sep = "")] = NA
+}
+for(i in colnames(def10b)){
+  results2[paste(i, ".home-1", sep = "")] = NA
+}
+
+for(i in colnames(off10b)){
+  results2[paste(i, ".away-1", sep = "")] = NA
+}
+for(i in colnames(off10b)){
+  results2[paste(i, ".home-1", sep = "")] = NA
+}
+```
+
+```{r}
+results2[1,17:44] = def11b[13,1:28]
+results2[1,45:72] = off11b[1,1:28]
+```
+
+```{r}
+# 2011 1:256
+# Home team defense
+for(i in 1:256){
+  for(j in 1:32){
+    if(results2[i,4] == def11b[j,2]){
+      results2[i,45:72] = def11b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 1:256){
+  for(j in 1:32){
+    if(results2[i,7] == def11b[j,2]){
+      results2[i,17:44] = def11b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 1:256){
+  for(j in 1:32){
+    if(results2[i,7] == off11b[j,2]){
+      results2[i,73:98] = off11b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 1:256){
+  for(j in 1:32){
+    if(results2[i,4] == off11b[j,2]){
+      results2[i,99:124] = off11b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2011 with lag
+# Home team defense
+for(i in 1:256){
+  for(j in 1:32){
+    if(results2[i,4] == def10b[j,2]){
+      results2[i,153:180] = def10b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 1:256){
+  for(j in 1:32){
+    if(results2[i,7] == def10b[j,2]){
+      results2[i,125:152] = def10b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 1:256){
+  for(j in 1:32){
+    if(results2[i,7] == off10b[j,2]){
+      results2[i,181:206] = off10b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 1:256){
+  for(j in 1:32){
+    if(results2[i,4] == off10b[j,2]){
+      results2[i,207:232] = off10b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2012 257:512
+# Home team defense
+for(i in 257:512){
+  for(j in 1:32){
+    if(results2[i,4] == def12b[j,2]){
+      results2[i,45:72] = def12b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 257:512){
+  for(j in 1:32){
+    if(results2[i,7] == def12b[j,2]){
+      results2[i,17:44] = def12b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 257:512){
+  for(j in 1:32){
+    if(results2[i,7] == off12b[j,2]){
+      results2[i,73:98] = off12b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 257:512){
+  for(j in 1:32){
+    if(results2[i,4] == off12b[j,2]){
+      results2[i,99:124] = off12b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2012 with lag
+# Home team defense
+for(i in 257:512){
+  for(j in 1:32){
+    if(results2[i,4] == def11b[j,2]){
+      results2[i,153:180] = def11b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 257:512){
+  for(j in 1:32){
+    if(results2[i,7] == def11b[j,2]){
+      results2[i,125:152] = def11b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 257:512){
+  for(j in 1:32){
+    if(results2[i,7] == off11b[j,2]){
+      results2[i,181:206] = off11b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 257:512){
+  for(j in 1:32){
+    if(results2[i,4] == off11b[j,2]){
+      results2[i,207:232] = off11b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2013 513:768
+# Home team defense
+for(i in 513:768){
+  for(j in 1:32){
+    if(results2[i,4] == def13b[j,2]){
+      results2[i,45:72] = def13b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 513:768){
+  for(j in 1:32){
+    if(results2[i,7] == def13b[j,2]){
+      results2[i,17:44] = def13b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 513:768){
+  for(j in 1:32){
+    if(results2[i,7] == off13b[j,2]){
+      results2[i,73:98] = off13b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 513:768){
+  for(j in 1:32){
+    if(results2[i,4] == off13b[j,2]){
+      results2[i,99:124] = off13b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2013 with lag
+# Home team defense
+for(i in 513:768){
+  for(j in 1:32){
+    if(results2[i,4] == def12b[j,2]){
+      results2[i,153:180] = def12b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 513:768){
+  for(j in 1:32){
+    if(results2[i,7] == def12b[j,2]){
+      results2[i,125:152] = def12b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 513:768){
+  for(j in 1:32){
+    if(results2[i,7] == off12b[j,2]){
+      results2[i,181:206] = off12b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 513:768){
+  for(j in 1:32){
+    if(results2[i,4] == off12b[j,2]){
+      results2[i,207:232] = off12b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2014 769:1024
+# Home team defense
+for(i in 769:1024){
+  for(j in 1:32){
+    if(results2[i,4] == def14b[j,2]){
+      results2[i,45:72] = def14b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 769:1024){
+  for(j in 1:32){
+    if(results2[i,7] == def14b[j,2]){
+      results2[i,17:44] = def14b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 769:1024){
+  for(j in 1:32){
+    if(results2[i,7] == off14b[j,2]){
+      results2[i,73:98] = off14b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 769:1024){
+  for(j in 1:32){
+    if(results2[i,4] == off14b[j,2]){
+      results2[i,99:124] = off14b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2014 with lag
+# Home team defense
+for(i in 769:1024){
+  for(j in 1:32){
+    if(results2[i,4] == def13b[j,2]){
+      results2[i,153:180] = def13b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 769:1024){
+  for(j in 1:32){
+    if(results2[i,7] == def13b[j,2]){
+      results2[i,125:152] = def13b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 769:1024){
+  for(j in 1:32){
+    if(results2[i,7] == off13b[j,2]){
+      results2[i,181:206] = off13b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 769:1024){
+  for(j in 1:32){
+    if(results2[i,4] == off13b[j,2]){
+      results2[i,207:232] = off13b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2015 1025:1280
+# Home team defense
+for(i in 1025:1280){
+  for(j in 1:32){
+    if(results2[i,4] == def15b[j,2]){
+      results2[i,45:72] = def15b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 1025:1280){
+  for(j in 1:32){
+    if(results2[i,7] == def15b[j,2]){
+      results2[i,17:44] = def15b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 1025:1280){
+  for(j in 1:32){
+    if(results2[i,7] == off15b[j,2]){
+      results2[i,73:98] = off15b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 1025:1280){
+  for(j in 1:32){
+    if(results2[i,4] == off15b[j,2]){
+      results2[i,99:124] = off15b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2015 with lag
+# Home team defense
+for(i in 1025:1280){
+  for(j in 1:32){
+    if(results2[i,4] == def14b[j,2]){
+      results2[i,153:180] = def14b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 1025:1280){
+  for(j in 1:32){
+    if(results2[i,7] == def14b[j,2]){
+      results2[i,125:152] = def14b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 1025:1280){
+  for(j in 1:32){
+    if(results2[i,7] == off14b[j,2]){
+      results2[i,181:206] = off14b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 1025:1280){
+  for(j in 1:32){
+    if(results2[i,4] == off14b[j,2]){
+      results2[i,207:232] = off14b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2016 1281:1536
+# Home team defense
+for(i in 1281:1536){
+  for(j in 1:32){
+    if(results2[i,4] == def16b[j,2]){
+      results2[i,45:72] = def16b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 1281:1536){
+  for(j in 1:32){
+    if(results2[i,7] == def16b[j,2]){
+      results2[i,17:44] = def16b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 1281:1536){
+  for(j in 1:32){
+    if(results2[i,7] == off16b[j,2]){
+      results2[i,73:98] = off16b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 1281:1536){
+  for(j in 1:32){
+    if(results2[i,4] == off16b[j,2]){
+      results2[i,99:124] = off16b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2016 with lag
+# Home team defense
+for(i in 1281:1536){
+  for(j in 1:32){
+    if(results2[i,4] == def15b[j,2]){
+      results2[i,153:180] = def15b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 1281:1536){
+  for(j in 1:32){
+    if(results2[i,7] == def15b[j,2]){
+      results2[i,125:152] = def15b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 1281:1536){
+  for(j in 1:32){
+    if(results2[i,7] == off15b[j,2]){
+      results2[i,181:206] = off15b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 1281:1536){
+  for(j in 1:32){
+    if(results2[i,4] == off15b[j,2]){
+      results2[i,207:232] = off15b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2017 1537:1792
+# Home team defense
+for(i in 1537:1792){
+  for(j in 1:32){
+    if(results2[i,4] == def17b[j,2]){
+      results2[i,45:72] = def17b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 1537:1792){
+  for(j in 1:32){
+    if(results2[i,7] == def17b[j,2]){
+      results2[i,17:44] = def17b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 1537:1792){
+  for(j in 1:32){
+    if(results2[i,7] == off17b[j,2]){
+      results2[i,73:98] = off17b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 1537:1792){
+  for(j in 1:32){
+    if(results2[i,4] == off17b[j,2]){
+      results2[i,99:124] = off17b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2017 with lag
+# Home team defense
+for(i in 1537:1792){
+  for(j in 1:32){
+    if(results2[i,4] == def16b[j,2]){
+      results2[i,153:180] = def16b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 1537:1792){
+  for(j in 1:32){
+    if(results2[i,7] == def16b[j,2]){
+      results2[i,125:152] = def16b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 1537:1792){
+  for(j in 1:32){
+    if(results2[i,7] == off16b[j,2]){
+      results2[i,181:206] = off16b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 1537:1792){
+  for(j in 1:32){
+    if(results2[i,4] == off16b[j,2]){
+      results2[i,207:232] = off16b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2018 1793:2048
+# Home team defense
+for(i in 1793:2048){
+  for(j in 1:32){
+    if(results2[i,4] == def18b[j,2]){
+      results2[i,45:72] = def18b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 1793:2048){
+  for(j in 1:32){
+    if(results2[i,7] == def18b[j,2]){
+      results2[i,17:44] = def18b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 1793:2048){
+  for(j in 1:32){
+    if(results2[i,7] == off18b[j,2]){
+      results2[i,73:98] = off18b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 1793:2048){
+  for(j in 1:32){
+    if(results2[i,4] == off18b[j,2]){
+      results2[i,99:124] = off18b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2018 with lag
+# Home team defense
+for(i in 1793:2048){
+  for(j in 1:32){
+    if(results2[i,4] == def17b[j,2]){
+      results2[i,153:180] = def17b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 1793:2048){
+  for(j in 1:32){
+    if(results2[i,7] == def17b[j,2]){
+      results2[i,125:152] = def17b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 1793:2048){
+  for(j in 1:32){
+    if(results2[i,7] == off17b[j,2]){
+      results2[i,181:206] = off17b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 1793:2048){
+  for(j in 1:32){
+    if(results2[i,4] == off17b[j,2]){
+      results2[i,207:232] = off17b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2019 2049:2304
+# Home team defense
+for(i in 2049:2304){
+  for(j in 1:32){
+    if(results2[i,4] == def19b[j,2]){
+      results2[i,45:72] = def19b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 2049:2304){
+  for(j in 1:32){
+    if(results2[i,7] == def19b[j,2]){
+      results2[i,17:44] = def19b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 2049:2304){
+  for(j in 1:32){
+    if(results2[i,7] == off19b[j,2]){
+      results2[i,73:98] = off19b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 2049:2304){
+  for(j in 1:32){
+    if(results2[i,4] == off19b[j,2]){
+      results2[i,99:124] = off19b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2019 with lag
+# Home team defense
+for(i in 2049:2304){
+  for(j in 1:32){
+    if(results2[i,4] == def18b[j,2]){
+      results2[i,153:180] = def18b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 2049:2304){
+  for(j in 1:32){
+    if(results2[i,7] == def18b[j,2]){
+      results2[i,125:152] = def18b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 2049:2304){
+  for(j in 1:32){
+    if(results2[i,7] == off18b[j,2]){
+      results2[i,181:206] = off18b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 2049:2304){
+  for(j in 1:32){
+    if(results2[i,4] == off18b[j,2]){
+      results2[i,207:232] = off18b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2020 2305:2560
+# Home team defense
+for(i in 2305:2560){
+  for(j in 1:32){
+    if(results2[i,4] == def20b[j,2]){
+      results2[i,45:72] = def20b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 2305:2560){
+  for(j in 1:32){
+    if(results2[i,7] == def20b[j,2]){
+      results2[i,17:44] = def20b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 2305:2560){
+  for(j in 1:32){
+    if(results2[i,7] == off20b[j,2]){
+      results2[i,73:98] = off20b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 2305:2560){
+  for(j in 1:32){
+    if(results2[i,4] == off20b[j,2]){
+      results2[i,99:124] = off20b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2020 with lag
+# Home team defense
+for(i in 2305:2560){
+  for(j in 1:32){
+    if(results2[i,4] == def19b[j,2]){
+      results2[i,153:180] = def19b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 2305:2560){
+  for(j in 1:32){
+    if(results2[i,7] == def19b[j,2]){
+      results2[i,125:152] = def19b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 2305:2560){
+  for(j in 1:32){
+    if(results2[i,7] == off19b[j,2]){
+      results2[i,181:206] = off19b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 2305:2560){
+  for(j in 1:32){
+    if(results2[i,4] == off19b[j,2]){
+      results2[i,207:232] = off19b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2021 2561:2592
+# Home team defense
+for(i in 2561:2592){
+  for(j in 1:32){
+    if(results2[i,4] == def21b[j,2]){
+      results2[i,45:72] = def21b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 2561:2592){
+  for(j in 1:32){
+    if(results2[i,7] == def21b[j,2]){
+      results2[i,17:44] = def21b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 2561:2592){
+  for(j in 1:32){
+    if(results2[i,7] == off21b[j,2]){
+      results2[i,73:98] = off21b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 2561:2592){
+  for(j in 1:32){
+    if(results2[i,4] == off21b[j,2]){
+      results2[i,99:124] = off21b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+```{r}
+# 2020 with lag
+# Home team defense
+for(i in 2561:2592){
+  for(j in 1:32){
+    if(results2[i,4] == def20b[j,2]){
+      results2[i,153:180] = def20b[j,1:28]
+    }
+  }
+}
+
+# Away team defense
+for(i in 2561:2592){
+  for(j in 1:32){
+    if(results2[i,7] == def20b[j,2]){
+      results2[i,125:152] = def20b[j,1:28]
+    }
+  }
+}
+
+# Away team offense
+for(i in 2561:2592){
+  for(j in 1:32){
+    if(results2[i,7] == off20b[j,2]){
+      results2[i,181:206] = off20b[j,c(1,4:28)]
+    }
+  }
+}
+
+# Home team offense
+for(i in 2561:2592){
+  for(j in 1:32){
+    if(results2[i,4] == off20b[j,2]){
+      results2[i,207:232] = off20b[j,c(1,4:28)]
+    }
+  }
+}
+```
+
+
+```{r}
+write.csv(results2, file = "frankenstein.csv")
+```
+
