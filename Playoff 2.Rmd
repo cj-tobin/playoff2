@@ -961,7 +961,7 @@ for(i in 2561:2592){
 ```
 
 ```{r}
-# 2020 with lag
+# 2021 with lag
 # Home team defense
 for(i in 2561:2592){
   for(j in 1:32){
