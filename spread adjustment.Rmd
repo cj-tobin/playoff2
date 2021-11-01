@@ -1,0 +1,58 @@
+---
+title: "Spread Adjustment"
+author: "Caroline Tobin"
+date: "10/31/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(tidyverse)
+```
+
+
+```{r}
+data = read.csv("playoff2data.csv")
+data = data %>%
+  select(-Team.away, -Team.home, -Team.away.1, -Team.home.1)
+
+team_ids = read.csv("nfl_teams.csv")
+team_ids = team_ids[-c(42),]
+
+data$newspread = NA
+```
+
+```{r}
+for(i in 1:nrow(data)){
+  if(data[i, "team_home"] == "Washington Redskins"){
+    data[i, "team_home"] = "Washington Football Team"
+  }
+  if(data[i, "team_away"] == "Washington Redskins"){
+    data[i, "team_away"] = "Washington Football Team"
+  }
+}
+```
+
+```{r}
+for(i in 1:nrow(data)){
+  for(j in 1:nrow(team_ids)){
+    if(data[i, "team_favorite_id"] == team_ids[j,"team_id"]){
+      data[i, "team_favorite_id"] = team_ids[j, "team_name"]
+    }
+  }
+}
+```
+
+```{r}
+for(i in 1:nrow(data)){
+  if(data[i, "team_home"] == data[i, "team_favorite_id"]){
+    data[i, "newspread"] = (data[i, "spread_favorite"] * -1)
+  } else {
+    data[i, "newspread"] = data[i, "spread_favorite"]
+  }
+}
+```
